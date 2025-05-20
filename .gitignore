@@ -1,0 +1,15 @@
+## .gitignore for Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# VS Code 配置
+.vscode/*
+
+# VS Code 工作区文件
+*.code-workspace
+
+# 其他可能的临时文件
+*.vsix
