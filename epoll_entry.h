@@ -19,8 +19,12 @@ typedef int (*RCALLBACK)(int fd);
 
 struct conn_item{
     int fd;
-    int idx;
-    char buffer[BUFFER_SIZE];
+    /*int idx;
+    char buffer[BUFFER_SIZE];*/
+	char rbuffer[BUFFER_SIZE];
+    int rlen;
+	char wbuffer[BUFFER_SIZE];
+    int wlen;
 
     RCALLBACK accept_callback;
     RCALLBACK recv_callback;

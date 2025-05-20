@@ -47,8 +47,10 @@ int accept_cb(int fd){    //创建监听连接，并创建conn_list的新对象�
     setup_event(clientfd,EPOLLIN,1);
     
     conn_list[clientfd].fd = clientfd;
-    conn_list[clientfd].idx = 0;
-    memset(conn_list[clientfd].buffer,0,BUFFER_SIZE);
+    memset(conn_list[clientfd].rbuffer, 0, BUFFER_SIZE);
+    conn_list[clientfd].rlen = 0;
+    memset(conn_list[clientfd].wbuffer, 0, BUFFER_SIZE);
+    conn_list[clientfd].wlen = 0;
     conn_list[clientfd].recv_callback = recv_cb;
     conn_list[clientfd].send_callback = send_cb;
 
@@ -56,8 +58,8 @@ int accept_cb(int fd){    //创建监听连接，并创建conn_list的新对象�
 }
 
 int recv_cb(int fd){  //接收数据，并修改fd的监听事件
-    char *buffer = conn_list[fd].buffer;
-    int idx = conn_list[fd].idx;
+    char *buffer = conn_list[fd].rbuffer;
+    int idx = conn_list[fd].rlen;
     int count = recv(fd,buffer+idx,BUFFER_SIZE-idx,0);
 
     if(count == 0){
@@ -68,14 +70,16 @@ int recv_cb(int fd){  //接收数据，并修改fd的监听事件
         return -1;
     }
 
-    conn_list[fd].idx = count;
+    conn_list[fd].rlen = count;
     int len = idx + count;
     while (len > 0 && (buffer[len - 1] == '\r' || buffer[len - 1] == '\n')) {
         buffer[len - 1] = '\0';
         len--;
     }
     setup_event(fd,EPOLLOUT,0);
-    conn_list[fd].idx -= conn_list[fd].idx;
+	memcpy(conn_list[fd].wbuffer, conn_list[fd].rbuffer, BUFFER_SIZE);
+    conn_list[fd].wlen = conn_list[fd].rlen;
+	conn_list[fd].rlen -= conn_list[fd].rlen;
     kvstore_request(&conn_list[fd]);
 
     return count > 0 ? count : 0;
@@ -83,8 +87,8 @@ int recv_cb(int fd){  //接收数据，并修改fd的监听事件
 
 int send_cb(int fd){  //发送数据，并修改fd的监听事件
     
-    char *buffer = conn_list[fd].buffer;
-    int idx = conn_list[fd].idx;
+    char *buffer = conn_list[fd].wbuffer;
+    int idx = conn_list[fd].wlen;
     int count = send(fd,buffer,idx,0);
 
     setup_event(fd,EPOLLIN,0);

@@ -62,7 +62,7 @@ int kvstore_split_token(char* msg, char** tokens) {
 
 int kvstore_request(struct conn_item *item){
 
-	char* msg = item->buffer;
+	char* msg = item->rbuffer;
 	char* tokens[MAX_TOKENS];
     //cout << "recv " << item->fd << ' ' << item->buffer << endl;
 	int count = kvstore_split_token(msg, tokens);
