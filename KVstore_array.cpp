@@ -6,7 +6,7 @@ int array_idx = 0;
 int kvstore_array_set(char* key, char* value) {
 	
 	if (key == NULL || value == NULL || array_idx == KV_ARRAY_SIZE) return -1;
-	
+	printf("set key: %s, value: %s", key, value);
 	char* kcopy = (char*)kvs_malloc(strlen(key) + 1);
 	if (kcopy == NULL) return -1;
 	strncpy(kcopy, key, strlen(key) + 1);
@@ -26,7 +26,7 @@ int kvstore_array_set(char* key, char* value) {
 }
 
 char* kvstore_array_get(char* key) {
-
+	printf("get key: %s", key);
 	int i = 0;
 	for (i = 0; i < array_idx; i++) {
 		if (strcmp(array_table[i].key, key) == 0) {

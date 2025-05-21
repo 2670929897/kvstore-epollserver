@@ -58,42 +58,48 @@ int accept_cb(int fd){    //创建监听连接，并创建conn_list的新对象�
 }
 
 int recv_cb(int fd){  //接收数据，并修改fd的监听事件
-    char *buffer = conn_list[fd].rbuffer;
+    char* buffer = conn_list[fd].rbuffer;
     int idx = conn_list[fd].rlen;
-    int count = recv(fd,buffer+idx,BUFFER_SIZE-idx,0);
 
-    if(count == 0){
+    int count = recv(fd, buffer, BUFFER_SIZE, 0);
+    if (count == 0) {
+        printf("disconnect\n");
 
-        cout << "断开连接 " << eventsList[fd].data.fd << endl;
-        epoll_ctl(epfd,EPOLL_CTL_DEL,fd,NULL);
+        epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL);
         close(fd);
+
         return -1;
     }
 
-    conn_list[fd].rlen = count;
-    int len = idx + count;
-    while (len > 0 && (buffer[len - 1] == '\r' || buffer[len - 1] == '\n')) {
-        buffer[len - 1] = '\0';
-        len--;
-    }
-    setup_event(fd,EPOLLOUT,0);
-	memcpy(conn_list[fd].wbuffer, conn_list[fd].rbuffer, BUFFER_SIZE);
-    conn_list[fd].wlen = conn_list[fd].rlen;
-	conn_list[fd].rlen -= conn_list[fd].rlen;
-    kvstore_request(&conn_list[fd]);
 
-    return count > 0 ? count : 0;
+    conn_list[fd].rlen = count;
+
+#if 0 //echo: need to send
+    memcpy(connlist[fd].wbuffer, connlist[fd].rbuffer, connlist[fd].rlen);
+    connlist[fd].wlen = connlist[fd].rlen;
+    connlist[fd].rlen -= connlist[fd].rlen;
+#else
+
+    kvstore_request(&conn_list[fd]);
+    conn_list[fd].wlen = strlen(conn_list[fd].wbuffer);
+#endif
+
+    setup_event(fd, EPOLLOUT, 0);
+
+
+    return count;
 }
 
 int send_cb(int fd){  //发送数据，并修改fd的监听事件
     
-    char *buffer = conn_list[fd].wbuffer;
+    char* buffer = conn_list[fd].wbuffer;
     int idx = conn_list[fd].wlen;
-    int count = send(fd,buffer,idx,0);
 
-    setup_event(fd,EPOLLIN,0);
+    int count = send(fd, buffer, idx, 0);
 
-    return count > 0 ? count : 0;
+    setup_event(fd, EPOLLIN, 0);
+
+    return count;
 }
 
 

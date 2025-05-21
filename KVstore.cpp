@@ -20,24 +20,28 @@ using namespace std;
 int kvstore_parser_protocol(struct conn_item* item, char** tokens, int count) {
 	if (tokens == NULL || count <= 0) return -1;
 
-	cout << tokens[0] << endl;
+
+	char* msg = item->wbuffer;
+	char* key = tokens[1];
+	char* value = tokens[2];
+	memset(msg, 0, BUFFER_SIZE);
+
 	if (strcmp(tokens[0], commands[0]) == 0) {
-		char* value = kvstore_array_get(tokens[1]);
-		if (value != NULL) {
-			cout << "GET OK" << endl;
-			cout << value << endl;
+		char* val = kvstore_array_get(key);
+		if (val) {
+			snprintf(msg, BUFFER_SIZE, "%s", val);
 		}
 		else {
-			cout << "GET ERROR" << endl;
+			snprintf(msg, BUFFER_SIZE, "NO EXIST");
 		}
 	}
 	else if (strcmp(tokens[0], commands[1]) == 0) {
-		int res = kvstore_array_set(tokens[1], tokens[2]);
+		int res = kvstore_array_set(key, value);
 		if (!res) {
-			cout << "SET OK" << endl;
+			snprintf(msg, BUFFER_SIZE, "SUCCESS");
 		}
 		else {
-			cout << "SET ERROR" << endl;
+			snprintf(msg, BUFFER_SIZE, "FAILED");
 		}
 	}
 	else if (strcmp(tokens[0], commands[2]) == 0) {
@@ -51,8 +55,10 @@ int kvstore_parser_protocol(struct conn_item* item, char** tokens, int count) {
 int kvstore_split_token(char* msg, char** tokens) {
 	if (msg == NULL || tokens == NULL) return -1;
 
-	char* token = strtok(msg, " ");
 	int idx = 0;
+
+	char* token = strtok(msg, " ");
+
 	while (token != NULL) {
 		tokens[idx++] = token;
 		token = strtok(NULL, " ");
