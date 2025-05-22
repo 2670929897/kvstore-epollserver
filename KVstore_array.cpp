@@ -35,3 +35,43 @@ char* kvstore_array_get(char* key) {
 	}
 	return NULL;
 }
+
+int kvstore_array_del(char* key) {
+	printf("del key: %s", key);
+	int i = 0;
+	for (i = 0; i < array_idx; i++) {
+		if (strcmp(array_table[i].key, key) == 0) {
+			kvs_free(array_table[i].key);
+			array_table[i].key = NULL;
+
+			kvs_free(array_table[i].value);
+			array_table[i].value = NULL;
+			return 0;
+		}
+	}
+	return i;
+}
+
+int kvstore_array_mod(char* key, char* value) {
+	printf("mod key: %s,value:%s", key,value)
+
+	if (key == NULL || value == NULL) return -1;
+
+	int i = 0;
+	for (i = 0; i < array_idx; i++) {
+		if (strcmp(array_table[i].key, key) == 0) {
+
+			kvs_free(array_table[i].value);
+			array_table[i].value = NULL;
+			char* vcopy = (char*)kvs_malloc(strlen(value) + 1);
+			if (vcopy == NULL) {
+				return -1;
+			}
+			strncpy(vcopy, value, strlen(value) + 1);
+			array_table[i].value = vcopy;
+			return 0;
+
+		}
+	}
+	return i;
+}

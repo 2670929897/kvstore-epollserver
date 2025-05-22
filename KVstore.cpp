@@ -45,10 +45,31 @@ int kvstore_parser_protocol(struct conn_item* item, char** tokens, int count) {
 		}
 	}
 	else if (strcmp(tokens[0], commands[2]) == 0) {
+		int res = kvstore_array_del(key);
+		if (res == 0) {
+			snprintf(msg, BUFFER_SIZE, "SUCCESS");
+		}
+		else if (res < 0) {
+			snprintf(msg, BUFFER_SIZE, "NO EXIST");
+		}
+		else {
+			snprintf(msg, BUFFER_SIZE, "FAILED");
+		}
 	}
 	else if (strcmp(tokens[0], commands[3]) == 0) {
+		int res = kvstore_array_mod(key, value);
+		if (res == 0) {
+			snprintf(msg, BUFFER_SIZE, "SUCCESS");
+		}
+		else if (res < 0) {
+			snprintf(msg, BUFFER_SIZE, "NO EXIST");
+		}
+		else {
+			snprintf(msg, BUFFER_SIZE, "FAILED");
+		}
 	}
 	else {
+		snprintf(msg, BUFFER_SIZE, "UNKNOWN COMMAND");
 	}
 }
 
