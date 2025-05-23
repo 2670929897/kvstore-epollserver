@@ -49,25 +49,25 @@ int kvstore_parser_protocol(struct conn_item* item, char** tokens, int count) {
 	else if (strcmp(tokens[0], commands[2]) == 0) {
 		int res = kvstore_array_del(key);
 		if (res == 0) {
-			snprintf(msg, BUFFER_SIZE, "SUCCESS");
+			snprintf(msg, BUFFER_SIZE, "%s","SUCCESS");
 		}
-		else if (res < 0) {
+		else if (res > 0) {
 			snprintf(msg, BUFFER_SIZE, "NO EXIST");
 		}
 		else {
-			snprintf(msg, BUFFER_SIZE, "FAILED");
+			snprintf(msg, BUFFER_SIZE, "%s","ERROR");
 		}
 	}
 	else if (strcmp(tokens[0], commands[3]) == 0) {
 		int res = kvstore_array_mod(key, value);
 		if (res == 0) {
-			snprintf(msg, BUFFER_SIZE, "SUCCESS");
+			snprintf(msg, BUFFER_SIZE, "%s","SUCCESS");
 		}
-		else if (res < 0) {
+		else if (res > 0) {
 			snprintf(msg, BUFFER_SIZE, "NO EXIST");
 		}
 		else {
-			snprintf(msg, BUFFER_SIZE, "FAILED");
+			snprintf(msg, BUFFER_SIZE, "%s", "ERROR");
 		}
 	}
 	else {
@@ -93,12 +93,9 @@ int kvstore_request(struct conn_item *item){
 
 	char* msg = item->rbuffer;
 	char* tokens[MAX_TOKENS];
-    //cout << "recv " << item->fd << ' ' << item->buffer << endl;
 	int count = kvstore_split_token(msg, tokens);
 
-	/*for (int i = 0; i < count; i++) {
-		cout << tokens[i] << endl;
-	}*/
+	
 	kvstore_parser_protocol(item, tokens, count);
 
 	return 0;
