@@ -9,7 +9,9 @@ const char* commands[] = {
 };
 
 void* kvs_malloc(size_t size) {
-	return malloc(size);
+	void* ptr = malloc(size);
+	memset(ptr, 0, size);
+	return ptr;
 }
 
 void kvs_free(void* ptr) {
@@ -28,7 +30,7 @@ int kvstore_parser_protocol(struct conn_item* item, char** tokens, int count) {
 
 	if (strcmp(tokens[0], commands[0]) == 0) {
 		char* val = kvstore_array_get(key);
-		if (val) {
+		if (val != NULL) {
 			snprintf(msg, BUFFER_SIZE, "%s", val);
 		}
 		else {

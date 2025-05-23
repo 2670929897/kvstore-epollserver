@@ -34,7 +34,9 @@ struct conn_item{
 int kvstore_parser_protocol(struct conn_item* item, char** tokens, int count);
 int kvstore_split_token(char* msg, char** tokens);
 int kvstore_request(struct conn_item* item);
+
 int epoll_entry(void);
+
 void* kvs_malloc(size_t size);
 void kvs_free(void* ptr);
 
@@ -50,6 +52,9 @@ struct kv_array_item {
 
 int kvstore_array_set(char* key, char* value);
 char* kvstore_array_get(char* key);
+int kvstore_array_del(char* key);
+int kvstore_array_mod(char* key, char* value);
+
 
 #endif // KVstore_array
 

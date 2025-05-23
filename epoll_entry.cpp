@@ -71,6 +71,12 @@ int recv_cb(int fd){  //接收数据，并修改fd的监听事件
         return -1;
     }
 
+    if (count > 0 && count < BUFFER_SIZE) {
+        buffer[count] = '\0';  // 明确终止字符串
+    }
+    else {
+        buffer[BUFFER_SIZE - 1] = '\0'; // 防止溢出
+    }
 
     conn_list[fd].rlen = count;
 
