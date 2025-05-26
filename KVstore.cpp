@@ -5,7 +5,11 @@ const char* commands[] = {
 	"GET",
 	"SET",
 	"DEL",
-	"MOD"
+	"MOD",
+	"RGET",
+	"RSET",
+	"RDEL",
+	"RMOD"
 };
 
 void* kvs_malloc(size_t size) {
@@ -17,6 +21,23 @@ void* kvs_malloc(size_t size) {
 void kvs_free(void* ptr) {
 	free(ptr);
 }
+
+#if KVSTORE_RBTREE
+int kvstore_rbtree_set(char* key, char* value) {
+	return kvs_rbtree_set(&Tree, key, value);
+}
+char* kvstore_rbtree_get(char* key) {
+	return kvs_rbtree_get(&Tree, key);
+}
+int kvstore_rbtree_del(char* key) {
+	return kvs_rbtree_del(&Tree, key);
+}
+int kvstore_rbtree_mod(char* key, char* value) {
+	return kvs_rbtree_mod(&Tree, key, value);
+}
+
+#endif
+
 using namespace std;
 
 int kvstore_parser_protocol(struct conn_item* item, char** tokens, int count) {
@@ -70,6 +91,49 @@ int kvstore_parser_protocol(struct conn_item* item, char** tokens, int count) {
 			snprintf(msg, BUFFER_SIZE, "%s", "ERROR");
 		}
 	}
+	else if (strcmp(tokens[0], commands[4]) == 0) {
+		char* val = kvstore_array_get(key);
+		if (val != NULL) {
+			snprintf(msg, BUFFER_SIZE, "%s",val);
+		}
+		else {
+			snprintf(msg, BUFFER_SIZE, "RNO EXIST");
+		}
+	}
+	else if (strcmp(tokens[0], commands[5]) == 0) {
+		int res = kvstore_array_set(key, value);
+		if (!res) {
+			snprintf(msg, BUFFER_SIZE, "RSUCCESS");
+		}
+		else {
+			snprintf(msg, BUFFER_SIZE, "RFAILED");
+		}
+	}
+	else if (strcmp(tokens[0], commands[6]) == 0) {
+		int res = kvstore_array_del(key);
+		if (res == 0) {
+			snprintf(msg, BUFFER_SIZE, "%s", "RSUCCESS");
+		}
+		else if (res > 0) {
+			snprintf(msg, BUFFER_SIZE, "RNO EXIST");
+		}
+		else {
+			snprintf(msg, BUFFER_SIZE, "%s", "RERROR");
+		}
+	}
+	else if (strcmp(tokens[0], commands[7]) == 0) {
+		int res = kvstore_array_mod(key, value);
+		if (res == 0) {
+			snprintf(msg, BUFFER_SIZE, "%s", "RSUCCESS");
+		}
+		else if (res > 0) {
+			snprintf(msg, BUFFER_SIZE, "RNO EXIST");
+		}
+		else {
+			snprintf(msg, BUFFER_SIZE, "%s", "RERROR");
+		}
+	}
+
 	else {
 		snprintf(msg, BUFFER_SIZE, "UNKNOWN COMMAND");
 	}
@@ -99,6 +163,19 @@ int kvstore_request(struct conn_item *item){
 	kvstore_parser_protocol(item, tokens, count);
 
 	return 0;
+}
+
+
+int init_kvengine(void) {
+
+#if KVSTORE_ARRAY
+
+#endif // KVstore_array
+
+#if KVSTORE_RBTREE
+	kvstore_rbtree_create(&Tree);
+#endif // KVstore_rbtree
+
 }
 
 int main() {
