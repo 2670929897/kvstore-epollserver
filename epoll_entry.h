@@ -37,8 +37,8 @@ int kvstore_request(struct conn_item* item);
 
 int epoll_entry(void);
 
-inline void* kvs_malloc(size_t size);
-inline void kvs_free(void* ptr);
+void* kvs_malloc(size_t size);
+void kvs_free(void* ptr);
 
 #define KVSTORE_ARRAY 1
 #define KVSTORE_RBTREE 1
@@ -70,8 +70,8 @@ int kvstore_rbtree_create(rbtree_t* tree);
 void kvstore_rbtree_destory(rbtree_t* tree);
 int kvs_rbtree_set(rbtree_t* tree, char* key, char* value);
 char* kvs_rbtree_get(rbtree_t* tree, char* key);
-int kvs_rbtree_delete(rbtree_t* tree, char* key);
-int kvs_rbtree_modify(rbtree_t* tree, char* key, char* value);
+int kvs_rbtree_del(rbtree_t* tree, char* key);
+int kvs_rbtree_mod(rbtree_t* tree, char* key, char* value);
 int kvs_rbtree_count(rbtree_t* tree);
 
 
