@@ -92,7 +92,7 @@ int kvstore_parser_protocol(struct conn_item* item, char** tokens, int count) {
 		}
 	}
 	else if (strcmp(tokens[0], commands[4]) == 0) {
-		char* val = kvstore_array_get(key);
+		char* val = kvstore_rbtree_get(key);
 		if (val != NULL) {
 			snprintf(msg, BUFFER_SIZE, "%s",val);
 		}
@@ -101,7 +101,7 @@ int kvstore_parser_protocol(struct conn_item* item, char** tokens, int count) {
 		}
 	}
 	else if (strcmp(tokens[0], commands[5]) == 0) {
-		int res = kvstore_array_set(key, value);
+		int res = kvstore_rbtree_set(key, value);
 		if (!res) {
 			snprintf(msg, BUFFER_SIZE, "RSUCCESS");
 		}
@@ -110,7 +110,7 @@ int kvstore_parser_protocol(struct conn_item* item, char** tokens, int count) {
 		}
 	}
 	else if (strcmp(tokens[0], commands[6]) == 0) {
-		int res = kvstore_array_del(key);
+		int res = kvstore_rbtree_del(key);
 		if (res == 0) {
 			snprintf(msg, BUFFER_SIZE, "%s", "RSUCCESS");
 		}
@@ -122,7 +122,7 @@ int kvstore_parser_protocol(struct conn_item* item, char** tokens, int count) {
 		}
 	}
 	else if (strcmp(tokens[0], commands[7]) == 0) {
-		int res = kvstore_array_mod(key, value);
+		int res = kvstore_rbtree_mod(key, value);
 		if (res == 0) {
 			snprintf(msg, BUFFER_SIZE, "%s", "RSUCCESS");
 		}
@@ -137,6 +137,7 @@ int kvstore_parser_protocol(struct conn_item* item, char** tokens, int count) {
 	else {
 		snprintf(msg, BUFFER_SIZE, "UNKNOWN COMMAND");
 	}
+	return 0;
 }
 
 int kvstore_split_token(char* msg, char** tokens) {
@@ -175,10 +176,23 @@ int init_kvengine(void) {
 #if KVSTORE_RBTREE
 	kvstore_rbtree_create(&Tree);
 #endif // KVstore_rbtree
+	return 0;
+}
 
+int exit_kvengine(void) {
+#if KVSTORE_ARRAY
+
+#endif
+
+#if KVSTORE_RBTREE
+	kvstore_rbtree_destory(&Tree);
+#endif
 }
 
 int main() {
+
+	init_kvengine();
     epoll_entry();
+	exit_kvengine();
     return 0;
 }
