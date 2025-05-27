@@ -70,19 +70,19 @@ int kvstore_parser_protocol(struct conn_item* item, char** tokens, int count) {
 	else if (strcmp(tokens[0], commands[2]) == 0) {
 		int res = kvstore_array_del(key);
 		if (res == 0) {
-			snprintf(msg, BUFFER_SIZE, "%s","SUCCESS");
+			snprintf(msg, BUFFER_SIZE, "%s", "SUCCESS");
 		}
 		else if (res > 0) {
 			snprintf(msg, BUFFER_SIZE, "NO EXIST");
 		}
 		else {
-			snprintf(msg, BUFFER_SIZE, "%s","ERROR");
+			snprintf(msg, BUFFER_SIZE, "%s", "ERROR");
 		}
 	}
 	else if (strcmp(tokens[0], commands[3]) == 0) {
 		int res = kvstore_array_mod(key, value);
 		if (res == 0) {
-			snprintf(msg, BUFFER_SIZE, "%s","SUCCESS");
+			snprintf(msg, BUFFER_SIZE, "%s", "SUCCESS");
 		}
 		else if (res > 0) {
 			snprintf(msg, BUFFER_SIZE, "NO EXIST");
@@ -94,7 +94,7 @@ int kvstore_parser_protocol(struct conn_item* item, char** tokens, int count) {
 	else if (strcmp(tokens[0], commands[4]) == 0) {
 		char* val = kvstore_rbtree_get(key);
 		if (val != NULL) {
-			snprintf(msg, BUFFER_SIZE, "%s",val);
+			snprintf(msg, BUFFER_SIZE, "%s", val);
 		}
 		else {
 			snprintf(msg, BUFFER_SIZE, "RNO EXIST");
@@ -152,15 +152,15 @@ int kvstore_split_token(char* msg, char** tokens) {
 		token = strtok(NULL, " ");
 	}
 	return idx;
-}	
+}
 
-int kvstore_request(struct conn_item *item){
+int kvstore_request(struct conn_item* item) {
 
 	char* msg = item->rbuffer;
 	char* tokens[MAX_TOKENS];
 	int count = kvstore_split_token(msg, tokens);
 
-	
+
 	kvstore_parser_protocol(item, tokens, count);
 
 	return 0;
@@ -192,7 +192,7 @@ int exit_kvengine(void) {
 int main() {
 
 	init_kvengine();
-    epoll_entry();
+	epoll_entry();
 	exit_kvengine();
-    return 0;
+	return 0;
 }

@@ -21,9 +21,9 @@ struct conn_item{
     int fd;
     /*int idx;
     char buffer[BUFFER_SIZE];*/
-	char rbuffer[BUFFER_SIZE];
+    char rbuffer[BUFFER_SIZE];
     int rlen;
-	char wbuffer[BUFFER_SIZE];
+    char wbuffer[BUFFER_SIZE];
     int wlen;
 
     RCALLBACK accept_callback;
@@ -46,8 +46,8 @@ void kvs_free(void* ptr);
 #if KVSTORE_ARRAY
 
 struct kv_array_item {
-	char* key;
-	char* value;
+    char* key;
+    char* value;
 };
 #define KV_ARRAY_SIZE 1024
 
